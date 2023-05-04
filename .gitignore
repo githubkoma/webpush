@@ -1,3 +1,4 @@
 virtualenv/*
 pywebpush/*
 vapid/*
+composer.lock

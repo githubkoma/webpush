@@ -5,9 +5,12 @@ Place this app in **nextcloud/apps/**
 ## General
 
 - High Level Info: 
-  - Apple Developer [VIDEO](https://developer.apple.com/videos/play/wwdc2022/10098/) that introduced the Feature for macOS Safari last year
-  - https://webkit.org/blog/12945/meet-web-push/
-  - Official SSL Cert for Nextcloud needed!
+    - Apple Developer [VIDEO](https://developer.apple.com/videos/play/wwdc2022/10098/) that introduced the Feature for macOS Safari last year
+    - https://webkit.org/blog/12945/meet-web-push/  
+    - iOS 
+        - 16.4+ needed
+        - Web Push only works if the web app is installed in the home screen
+    - Official SSL Cert for Nextcloud mandatory!
 - Lower Level Info: 
   - Apple [Sending web push notifications in web apps, Safari, and other browsers](https://developer.apple.com/documentation/usernotifications/sending_web_push_notifications_in_web_apps_safari_and_other_browsers)
   -  Great Detail Articles

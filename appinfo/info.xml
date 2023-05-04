@@ -4,15 +4,16 @@
     <id>webpush</id>
     <name>Web Push</name>
     <summary>Web Push Summary</summary>
-    <description><![CDATA[Web Push Description]]></description>
-    <version>0.0.1</version>
+    <description><![CDATA[WebPush Notifications]]></description>
+    <version>0.0.1a</version>
     <licence>agpl</licence>
-    <author mail="author@web.page" homepage="https://github.com/xyz">AuthorX</author>
+    <author mail="author@web.page" homepage="https://github.com/githubkoma/webpush">githubkoma</author>
     <namespace>WebPush</namespace>
     <category>social</category>
-    <bugs>https://github.com/xyz</bugs>
+    <bugs>https://github.com/githubkoma/issues</bugs>
     <dependencies>
         <nextcloud min-version="24" max-version="27"/>
+        <php min-version="8.0" />
     </dependencies>
     <!-- This app only lives in the User- and Admin Settings
          

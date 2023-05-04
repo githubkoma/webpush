@@ -11,5 +11,6 @@ return [
     'routes' => [
 	   //['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
 	   ['name' => 'page#do_echo', 'url' => '/echo', 'verb' => 'POST'],
+       ['name' => 'personal_settings#subscribe', 'url' => '/subscribe', 'verb' => 'POST'],
     ]
 ];
