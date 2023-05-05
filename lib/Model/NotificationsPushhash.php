@@ -17,7 +17,7 @@ class NotificationsPushhash extends Entity implements JsonSerializable {
     protected $proxyserver; 
     protected $apptype; 
 
-    public function jsonSerialize() {
+    public function jsonSerialize(): Array {
         return [
             'id' => $this->id, 
             'uid' => $this->uid,

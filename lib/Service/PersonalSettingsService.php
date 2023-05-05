@@ -53,23 +53,25 @@ class PersonalSettingsService {
 			$jsonSubscription = json_decode($subscription);			
 
 			try {
-				$this->notificationsPushhashMapper->findBySubscription($subscription);
+				$this->notificationsPushhashMapper->findBySubscription($subscription);				
+				$this->webPushLibraryService->notifyOne($subscription, $title = "Success!", $body = "Thank you, you have subscribed successfully", $action = "", $actionURL = "");
 			} catch(\OCP\AppFramework\Db\DoesNotExistException $e) {					
 				$notificationsPushhash = new NotificationsPushhash();
 				$notificationsPushhash->setUid($userId);			
-				$notificationsPushhash->setToken("unused");
+				$notificationsPushhash->setToken(time());
 				$notificationsPushhash->setDeviceidentifier("unused");
 				$notificationsPushhash->setDevicepublickey($subscription);
 				$notificationsPushhash->setDevicepublickeyhash("unused");
 				$notificationsPushhash->setPushtokenhash("unused");
 				$notificationsPushhash->setProxyserver("unused");
 				$notificationsPushhash->setApptype("webpush");					
-				$arrResult["notificationsPushhash"] = $this->notificationsPushhashMapper->insert($notificationsPushhash);	
-			}		
+				$this->notificationsPushhashMapper->insert($notificationsPushhash);								
 
-			$arrResult["subscriptionEcho"] = $subscription;
-			$arrResult["userSubscriptions"] = $this->webPushLibraryService->findUserSubscriptions($userId);
-            $arrResult["notifyEcho"] = $this->webPushLibraryService->notifyOne($subscription, $title = "Success!", $body = "Thank you, you have subscribed successfully", $action = "", $actionURL = "");
+				$this->webPushLibraryService->notifyOne($subscription, $title = "Success!", $body = "Thank you, you have subscribed successfully", $action = "", $actionURL = "");
+
+			}
+			
+			$arrResult["subscriptionEcho"] = $jsonSubscription;	
 
 		  } catch(Exception $e) {
 			$this->handleException($e);
