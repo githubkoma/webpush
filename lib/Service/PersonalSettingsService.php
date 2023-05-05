@@ -5,20 +5,25 @@ use Exception;
 
 use OCP\IConfig;
 use OCA\WebPush\Service\WebPushLibraryService;
+use OCA\WebPush\Model\NotificationsPushhash;
+use OCA\WebPush\Model\NotificationsPushhashMapper;
 
 class PersonalSettingsService {
     
 	// Additional Services
 	private $appConfig;
     private $webPushLibraryService;
+	private $notificationsPushhashMapper;
 
 	public function __construct(string $AppName,
                                 WebPushLibraryService $webPushLibraryService,
+								NotificationsPushhashMapper $notificationsPushhashMapper,
 								IConfig $appConfig ) {		
 		$this->appConfig = $appConfig;
 		$this->appName = $AppName;
 		$this->appVersion = $this->appConfig->getAppValue($this->appName, "installed_version");			
         $this->webPushLibraryService = $webPushLibraryService;
+		$this->notificationsPushhashMapper = $notificationsPushhashMapper;		
 	}
 
     private function handleException ($e) {
@@ -45,8 +50,26 @@ class PersonalSettingsService {
 
 		try {
 			
+			$jsonSubscription = json_decode($subscription);			
+
+			try {
+				$this->notificationsPushhashMapper->findByEndpoint($jsonSubscription->endpoint);
+			} catch(\OCP\AppFramework\Db\DoesNotExistException $e) {					
+				$notificationsPushhash = new NotificationsPushhash();
+				$notificationsPushhash->setUid($userId);			
+				$notificationsPushhash->setToken($jsonSubscription->endpoint);
+				$notificationsPushhash->setDeviceidentifier("unused");
+				$notificationsPushhash->setDevicepublickey($jsonSubscription->keys->p256dh);
+				$notificationsPushhash->setDevicepublickeyhash($jsonSubscription->keys->auth);
+				$notificationsPushhash->setPushtokenhash("unused");
+				$notificationsPushhash->setProxyserver("unused");
+				$notificationsPushhash->setApptype("webpush");					
+				$arrResult["notificationsPushhash"] = $this->notificationsPushhashMapper->insert($notificationsPushhash);	
+			}		
+
 			$arrResult["subscriptionEcho"] = $subscription;
-            $arrResult["notifyEcho"] = $this->webPushLibraryService->notifyOne($subscription);
+			$arrResult["userSubscriptions"] = $this->webPushLibraryService->findUserSubscriptions($userId);
+            $arrResult["notifyEcho"] = $this->webPushLibraryService->notifyOne($subscription, $title = "Success!", $body = "Thank you, you have subscribed successfully", $action = "", $actionURL = "");
 
 		  } catch(Exception $e) {
 			$this->handleException($e);

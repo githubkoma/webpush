@@ -4,6 +4,9 @@ namespace OCA\WebPush\Service;
 use Exception;
 use OCP\IConfig;
 
+use OCA\WebPush\Model\NotificationsPushhash;
+use OCA\WebPush\Model\NotificationsPushhashMapper;
+
 require __DIR__ . '/web-push-php/vendor/autoload.php';
 use Minishlink\WebPush\WebPush;
 use Minishlink\WebPush\Subscription;
@@ -12,12 +15,15 @@ class WebPushLibraryService {
     
 	// Additional Services
 	private $appConfig;
+	private $notificationsPushhashMapper;
 
 	public function __construct(string $AppName, 
+								NotificationsPushhashMapper $notificationsPushhashMapper,
 								IConfig $appConfig ) {		
 		$this->appConfig = $appConfig;
 		$this->appName = $AppName;
 		//$this->appVersion = $this->appConfig->getAppValue($this->appName, "installed_version");			
+		$this->notificationsPushhashMapper = $notificationsPushhashMapper;
 	}
 
     private function handleException ($e) {
@@ -33,12 +39,12 @@ class WebPushLibraryService {
         }
     }	
 
-    public function notifyOne(string $subscription) {    
+    public function notifyOne(string $subscription, string $title, string $body, string $actionTitle, string $actionURL) {    
 
-		if ($subscription == "") {
+		if ($subscription == "" || $title == "" || $body == "" ) {
 			throw new WrongParameterException;
 		}
-		
+				
 		$result = "";
 		
 		try {		
@@ -70,7 +76,7 @@ class WebPushLibraryService {
 					/*
 					REGARDING 'pem':
 					IF: PHP Fatal error: Uncaught ErrorException: [VAPID] Private key should be 32 bytes long when decoded. in /path/to/project/vendor/minishlink/web-push/src/VAPID.php:84
-					THEN: "I have noticed that (/path/to/project/vendor/minishlink/web-push/src/VAPID.php:64) doubles the length"
+					THEN: "I have noticed that (/path/to/project/vendor/minishlink/web-push/src/VAPID.php:64) doubles the length" -> remove "2 *"
 					*/
 				],
 			];
@@ -84,10 +90,10 @@ class WebPushLibraryService {
 						'authToken' => $jsonSubscription->keys->auth, // base 64 encoded, should be 24 chars
 					]),
 					'payload' => json_encode([
-						"title" => "Success!",
-						"body" => "Thank you, you have subscribed successfully.",
-						"actionURL" => "",
-						"actionTitle" => ""
+						"title" => $title,
+						"body" => $body,
+						"actionURL" => $actionURL,
+						"actionTitle" => $actionTitle,
 					])
 				]
 			];
@@ -109,6 +115,24 @@ class WebPushLibraryService {
         return $result;
     
     }
+
+    public function findUserSubscriptions(string $userId) {    
+
+		if ($userId == "") {
+			throw new WrongParameterException;
+		}
+		
+		$result = [];
+		
+		try {
+			$result = $this->notificationsPushhashMapper->findAllByUserAndApptype($userId, "webpush");		
+		} catch (Exception $e) {
+			// this isnt a problem			
+		}
+
+		return $result;
+
+	}
 
 }
 
