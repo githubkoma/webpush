@@ -26,13 +26,13 @@ class NotificationsPushhashMapper extends QBMapper {
         return $this->findEntity($qb);
     }	
 
-	public function findByEndpoint(string $endpoint) {
+	public function findBySubscription(string $subscription) {
         $qb = $this->db->getQueryBuilder();
 
                     $qb->select('*')
                              ->from($this->getTableName())
                              ->where(
-									$qb->expr()->eq('token', $qb->createNamedParameter($endpoint))
+									$qb->expr()->eq('devicepublickey', $qb->createNamedParameter($subscription))
            );
         
         return $this->findEntity($qb);

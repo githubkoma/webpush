@@ -53,14 +53,14 @@ class PersonalSettingsService {
 			$jsonSubscription = json_decode($subscription);			
 
 			try {
-				$this->notificationsPushhashMapper->findByEndpoint($jsonSubscription->endpoint);
+				$this->notificationsPushhashMapper->findBySubscription($subscription);
 			} catch(\OCP\AppFramework\Db\DoesNotExistException $e) {					
 				$notificationsPushhash = new NotificationsPushhash();
 				$notificationsPushhash->setUid($userId);			
-				$notificationsPushhash->setToken($jsonSubscription->endpoint);
+				$notificationsPushhash->setToken("unused");
 				$notificationsPushhash->setDeviceidentifier("unused");
-				$notificationsPushhash->setDevicepublickey($jsonSubscription->keys->p256dh);
-				$notificationsPushhash->setDevicepublickeyhash($jsonSubscription->keys->auth);
+				$notificationsPushhash->setDevicepublickey($subscription);
+				$notificationsPushhash->setDevicepublickeyhash("unused");
 				$notificationsPushhash->setPushtokenhash("unused");
 				$notificationsPushhash->setProxyserver("unused");
 				$notificationsPushhash->setApptype("webpush");					
