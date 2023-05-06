@@ -5,25 +5,20 @@ use Exception;
 
 use OCP\IConfig;
 use OCA\WebPush\Service\WebPushLibraryService;
-use OCA\WebPush\Model\NotificationsPushhash;
-use OCA\WebPush\Model\NotificationsPushhashMapper;
 
 class PersonalSettingsService {
     
 	// Additional Services
 	private $appConfig;
     private $webPushLibraryService;
-	private $notificationsPushhashMapper;
 
 	public function __construct(string $AppName,
                                 WebPushLibraryService $webPushLibraryService,
-								NotificationsPushhashMapper $notificationsPushhashMapper,
 								IConfig $appConfig ) {		
 		$this->appConfig = $appConfig;
 		$this->appName = $AppName;
 		$this->appVersion = $this->appConfig->getAppValue($this->appName, "installed_version");			
         $this->webPushLibraryService = $webPushLibraryService;
-		$this->notificationsPushhashMapper = $notificationsPushhashMapper;		
 	}
 
     private function handleException ($e) {
@@ -53,22 +48,12 @@ class PersonalSettingsService {
 			$jsonSubscription = json_decode($subscription);			
 
 			try {
-				$this->notificationsPushhashMapper->findBySubscription($subscription);				
-				$this->webPushLibraryService->notifyOne($subscription, $title = "Success!", $body = "Thank you, you have subscribed successfully", $action = "", $actionURL = "");
-			} catch(\OCP\AppFramework\Db\DoesNotExistException $e) {					
-				$notificationsPushhash = new NotificationsPushhash();
-				$notificationsPushhash->setUid($userId);			
-				$notificationsPushhash->setToken(time());
-				$notificationsPushhash->setDeviceidentifier("unused");
-				$notificationsPushhash->setDevicepublickey($subscription);
-				$notificationsPushhash->setDevicepublickeyhash("unused");
-				$notificationsPushhash->setPushtokenhash("unused");
-				$notificationsPushhash->setProxyserver("unused");
-				$notificationsPushhash->setApptype("webpush");					
-				$this->notificationsPushhashMapper->insert($notificationsPushhash);								
+				$this->webPushLibraryService->findSubscription($subscription);				
+				$this->webPushLibraryService->notifyOne($userId, $subscription, $title = "Success!", $body = "Thank you, you have subscribed successfully", $action = "", $actionURL = "");
+			} catch(\OCP\AppFramework\Db\DoesNotExistException $e) {
+				$this->webPushLibraryService->add($userId, $subscription);								
 
-				$this->webPushLibraryService->notifyOne($subscription, $title = "Success!", $body = "Thank you, you have subscribed successfully", $action = "", $actionURL = "");
-
+				$this->webPushLibraryService->notifyOne($userId, $subscription, $title = "Success!", $body = "Thank you, you have subscribed successfully", $action = "", $actionURL = "");
 			}
 			
 			$arrResult["subscriptionEcho"] = $jsonSubscription;	

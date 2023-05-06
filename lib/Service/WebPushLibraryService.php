@@ -3,9 +3,10 @@ namespace OCA\WebPush\Service;
 
 use Exception;
 use OCP\IConfig;
+use Psr\Log\LoggerInterface;
 
-use OCA\WebPush\Model\NotificationsPushhash;
-use OCA\WebPush\Model\NotificationsPushhashMapper;
+use OCA\WebPush\Model\WebPushSubscription;
+use OCA\WebPush\Model\WebPushSubscriptionMapper;
 
 require __DIR__ . '/web-push-php/vendor/autoload.php';
 use Minishlink\WebPush\WebPush;
@@ -15,15 +16,19 @@ class WebPushLibraryService {
     
 	// Additional Services
 	private $appConfig;
-	private $notificationsPushhashMapper;
+	/** @var LoggerInterface */
+	protected $log;
+	private $webPushSubscriptionMapper;
 
 	public function __construct(string $AppName, 
-								NotificationsPushhashMapper $notificationsPushhashMapper,
-								IConfig $appConfig ) {		
+								WebPushSubscriptionMapper $webPushSubscriptionMapper,
+								LoggerInterface $log,
+								IConfig $appConfig) {		
 		$this->appConfig = $appConfig;
 		$this->appName = $AppName;
+		$this->log = $log;
 		//$this->appVersion = $this->appConfig->getAppValue($this->appName, "installed_version");			
-		$this->notificationsPushhashMapper = $notificationsPushhashMapper;
+		$this->webPushSubscriptionMapper = $webPushSubscriptionMapper;
 	}
 
     private function handleException ($e) {
@@ -39,7 +44,14 @@ class WebPushLibraryService {
         }
     }	
 
-    public function notifyOne(string $subscription, string $title, string $body, string $actionTitle, string $actionURL) {    
+	public function webpushToUser(string $userId, string $title, string $body, string $actionTitle, string $actionURL) {   
+		$arrUserSubscriptions = $this->findUserSubscriptions($userId);
+		foreach ($arrUserSubscriptions as $subscription) {
+			$this->notifyOne($userId, $subscription->getSubscription(), $title, $body, $actionTitle, $actionURL);
+		}
+	}
+
+    public function notifyOne(string $userId, string $subscription, string $title, string $body, string $actionTitle, string $actionURL) {    
 
 		if ($subscription == "" || $title == "" || $body == "" ) {
 			throw new WrongParameterException;
@@ -47,7 +59,12 @@ class WebPushLibraryService {
 				
 		$result = "";
 		
-		try {		
+		try {	
+			
+			$this->log->debug('Debug: {details}', [
+				'app' => 'webpush',
+				'details' => 'Trying WebPush now: "'  . $title . '" - "' . $body . '"',
+			]);
 
 			$jsonSubscription = json_decode($subscription);
 
@@ -91,7 +108,7 @@ class WebPushLibraryService {
 					]),
 					'payload' => json_encode([
 						"title" => $title,
-						"body" => $body,
+						"body" => $body . " (WebPush)",
 						"actionURL" => $actionURL,
 						"actionTitle" => $actionTitle,
 					])
@@ -125,7 +142,7 @@ class WebPushLibraryService {
 		$result = [];
 		
 		try {
-			$result = $this->notificationsPushhashMapper->findAllByUserAndApptype($userId, "webpush");		
+			$result = $this->webPushSubscriptionMapper->findAllByUser($userId);		
 		} catch (Exception $e) {
 			// this isnt a problem			
 		}
@@ -133,6 +150,55 @@ class WebPushLibraryService {
 		return $result;
 
 	}
+
+    public function findSubscription(string $subscription) {    
+
+		if ($subscription == "") {
+			throw new WrongParameterException;
+		}
+		
+		$result = [];
+
+		$result = $this->webPushSubscriptionMapper->findSubscription($subscription);		
+
+		return $result;
+
+	}
+
+    public function add(string $userId, string $subscription) {    
+
+		if ($subscription == "") {
+			throw new WrongParameterException;
+		}
+
+		$jsonSubscription = json_decode($subscription);
+
+		$result = [];		
+
+		$webPushSubscription = new WebPushSubscription();
+		$webPushSubscription->setUserId($userId);			
+		$webPushSubscription->setIdentifier(time());			
+		$webPushSubscription->setSubscription($subscription);
+		$webPushSubscription->setSubscriptionEndpoint($jsonSubscription->endpoint);
+		$webPushSubscription->setSubscriptionKeysP256dh($jsonSubscription->keys->p256dh);
+		$webPushSubscription->setSubscriptionKeysAuth($jsonSubscription->keys->auth);
+		$webPushSubscription->setSubscriptionExpirationTime(0);
+		$webPushSubscription->setCrtUserId($userId);
+		$webPushSubscription->setCrtDate(time());
+		$webPushSubscription->setLastUpdate(time());					
+		$webPushSubscription->setIsArchived(0);					
+		$webPushSubscription->setUpdateUserId($userId);					
+		$webPushSubscription->setEtag(0);					
+		$result = $this->webPushSubscriptionMapper->insert($webPushSubscription);	
+		$this->log->debug('Debug: {details}', [
+			'app' => 'webpush',
+			'details' => 'Added Subscription: ' .  $userId . ' ' . $webPushSubscription->getIdentifier(),
+		]);
+
+		return $result;
+
+	}
+
 
 }
 
