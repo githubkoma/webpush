@@ -96,7 +96,7 @@ async function postSubscription($pushSubscription) {
     cache: false,                
     success: function(data){    
       console.log("success:", data);
-      localStorage.setItem('webpushCurrentSubscription', data.subscriptionEcho);
+      localStorage.setItem('webpushCurrentSubscription', JSON.stringify(data.subscriptionEcho));
       document.getElementById("webpushTextCurrentSubscription").innerText = '...' + JSON.parse(localStorage.getItem('webpushCurrentSubscription')).endpoint.slice(-6);
 
     },

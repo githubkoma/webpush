@@ -75,7 +75,7 @@ class Version000001Date20230506151500 extends SimpleMigrationStep {
 			]);
 			$table->addColumn('subscription_endpoint', Types::STRING, [
 				'notnull' => true,
-				'length' => 128,
+				'length' => 512,
 			]);
 			$table->addColumn('subscription_keys_p256dh', Types::STRING, [
 				'notnull' => true,
