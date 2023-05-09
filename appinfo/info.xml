@@ -5,7 +5,7 @@
     <name>Web Push</name>
     <summary>Web Push Summary</summary>
     <description><![CDATA[WebPush Notifications]]></description>
-    <version>0.0.2b</version>
+    <version>0.0.2c</version>
     <licence>agpl</licence>
     <author mail="author@web.page" homepage="https://github.com/githubkoma/webpush">githubkoma</author>
     <namespace>WebPush</namespace>
@@ -14,6 +14,10 @@
     <dependencies>
         <nextcloud min-version="24" max-version="27"/>
         <php min-version="8.1" />
+        <lib>curl</lib>        
+        <lib>openssl</lib>
+        <lib>mbstring</lib>
+        <lib>gmp</lib>
     </dependencies>
     <!-- This app only lives in the User- and Admin Settings
          

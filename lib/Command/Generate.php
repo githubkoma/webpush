@@ -98,7 +98,7 @@ class Generate extends Command {
             $this->webPushLibraryService->webpushToUser($userId, $subject, $message, $action = "", $actionURL = "");
 
 		} catch (\Exception $e) {
-			$output->writeln('Error while sending the webpush notification');
+			$output->writeln('Error while sending the webpush notification: ' . $e);
 			return 1;
 		}
 
