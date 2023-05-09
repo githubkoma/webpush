@@ -5,7 +5,7 @@
     <name>Web Push</name>
     <summary>Web Push Summary</summary>
     <description><![CDATA[WebPush Notifications]]></description>
-    <version>0.0.2a</version>
+    <version>0.0.2b</version>
     <licence>agpl</licence>
     <author mail="author@web.page" homepage="https://github.com/githubkoma/webpush">githubkoma</author>
     <namespace>WebPush</namespace>
@@ -28,4 +28,7 @@
         <personal>OCA\WebPush\Settings\WebPushPersonal</personal>
         <personal-section>OCA\WebPush\Sections\WebPushPersonal</personal-section>
     </settings>
+	<commands>
+		<command>OCA\WebPush\Command\Generate</command>
+	</commands>
 </info>
