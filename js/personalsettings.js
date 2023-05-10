@@ -8,7 +8,7 @@ $('#webpushBtnSubscribe').on( "click", function() {
 
   if (window.Notification.permission === "granted") {
       
-    // ServiceWorker is needed for Push Subscription Functions
+    // 1. Get the ServiceWorker, which is needed for Push Subscription Functions
     navigator.serviceWorker.getRegistration('/apps/webpush/js/service-worker-webpush.js').then(
       function (registration) {
           // SW Registration ok?        
@@ -19,8 +19,8 @@ $('#webpushBtnSubscribe').on( "click", function() {
           } else {
             console.log("Empty:", "SW not loaded yet");
             navigator.serviceWorker.register('/apps/webpush/js/service-worker-webpush.js').then(function(registration) {
-              subscribeUserToPush(registration);
-              console.log("SW registered")
+              console.log("SW registered");
+              subscribeUserToPush(registration);              
             });            
           }
       }, 
@@ -37,11 +37,9 @@ $('#webpushBtnSubscribe').on( "click", function() {
 
 function subscribeUserToPush(registration) {
 
+  // 2. Now try to Subscribe by using the Servers Vapid Public Key
   if (document.getElementById('webpushHiddenVapidApplicationServerPublicKey').innerText !== "") {
 
-    // https://github.com/web-push-libs/
-    //   create VAPID: https://github.com/web-push-libs/vapid
-    //   send via CLI: https://github.com/web-push-libs/pywebpush
     let serverPublicKey = document.getElementById('webpushHiddenVapidApplicationServerPublicKey').innerText; // = VAPIDs applicationServerKey
 
     const subscribeOptions = {
@@ -57,6 +55,23 @@ function subscribeUserToPush(registration) {
 
       postSubscription(pushSubscription);
       return pushSubscription;
+    }, 
+    function (error) {
+        console.log("Subscription Error:", error);           
+        alert(error);
+
+        // Unsubscription is needed when the Server changed its VAPID Public Key
+        registration.pushManager.getSubscription().then((subscription) => {
+          subscription
+            .unsubscribe()
+            .then((successful) => {
+              alert("You have been unsubscribed, now please try again.");
+            })
+            .catch((e) => {
+              alert("Unsubscribing failed.");
+            });
+        });
+            
     });
 
   }

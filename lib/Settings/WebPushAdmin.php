@@ -6,7 +6,7 @@ use OCP\IConfig;
 use OCP\IL10N;
 use OCP\Settings\ISettings;
 
-class WebPushPersonal implements ISettings {
+class WebPushAdmin implements ISettings {
     private IL10N $l;
     private IConfig $config;
 
@@ -21,10 +21,13 @@ class WebPushPersonal implements ISettings {
     public function getForm() {
         $parameters = [
             //'mySetting' => $this->config->getSystemValue('my_notes_setting', true),
+            'VAPID_subject' => $this->config->getAppValue("webpush", "VAPID_subject"),
             'VAPID_publicKey' => $this->config->getAppValue("webpush", "VAPID_publicKey"),
+            'VAPID_privateKey' => $this->config->getAppValue("webpush", "VAPID_privateKey"),
+            //'VAPID_pem' => $this->config->getAppValue("webpush", "VAPID_pem"),
         ];
 
-        return new TemplateResponse('webpush', 'settings/personal', $parameters, '');
+        return new TemplateResponse('webpush', 'settings/admin', $parameters, '');
     }
 
     public function getSection() {

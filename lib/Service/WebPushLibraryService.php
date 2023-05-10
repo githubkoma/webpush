@@ -51,6 +51,29 @@ class WebPushLibraryService {
 		}
 	}
 
+	public function generateAndStoreVapidKeys($userId) {  
+		$result = [];		
+		try {
+			$adminEmail = $this->appConfig->getUserValue($userId, "settings", "email");
+			if ($adminEmail !== "") {
+				$this->appConfig->setAppValue($this->appName, "VAPID_subject", "mailto:" . $adminEmail);
+				$vapidKeys = \Minishlink\WebPush\VAPID::createVapidKeys();				
+				$this->appConfig->setAppValue($this->appName, "VAPID_publicKey", $vapidKeys["publicKey"]);
+				$this->appConfig->setAppValue($this->appName, "VAPID_privateKey", $vapidKeys["privateKey"]);				
+				// FLUSH ALL USER SUBSCRIPTIONS AS THEY ARE GETTING INVALID ANYWAYS
+				$this->webPushSubscriptionMapper->deleteAllSubscriptions();
+				$result = ["Success" , "Please close this Window and reload the WebPush Admin Settings page to view the new Keys"];
+			} else {
+				$result = ["Error", "Valid E-Mail address in your Settings needed."];
+			};
+
+		} catch (\Exception $e) {
+			$result = ["Error creating Vapid Keys", $e];
+		}
+
+		return $result;
+	}
+
     public function notifyOne(string $userId, string $subscription, string $title, string $body, string $actionTitle, string $actionURL) {    
 
 		if ($subscription == "" || $title == "" || $body == "" ) {
@@ -68,9 +91,7 @@ class WebPushLibraryService {
 
 			$jsonSubscription = json_decode($subscription);
 
-			$result = $jsonSubscription->keys->auth;		
-			
-			//$result = \Minishlink\WebPush\VAPID::createVapidKeys();
+			$result = $jsonSubscription->keys->auth;				
 
 			$auth = [
 				// Create VAPID Key first -> "private_key.pem"
@@ -84,8 +105,9 @@ class WebPushLibraryService {
 					'publicKey' => $this->appConfig->getAppValue($this->appName, "VAPID_publicKey"), // (recommended) uncompressed public key P-256 encoded in Base64-URL
 					// $ openssl ec -in private_key.pem -outform DER|tail -c +8|head -c 32|base64|tr -d '=' |tr '/+' '_-' >> private_key.txt
 					'privateKey' => $this->appConfig->getAppValue($this->appName, "VAPID_privateKey"), // (recommended) in fact the secret multiplier of the private key encoded in Base64-URL
-					//'pemFile' => '/var/www/html/apps/webpush/pywebpush/private_key.pem', // if you have a PEM file and can link to it on your filesystem
-					'pem' => str_replace("'", "", $this->appConfig->getAppValue($this->appName, "VAPID_pem")), // if you have a PEM file and want to hardcode its content
+					// _OR_ PEM STRING/FILE:					
+					//'pem' => str_replace("'", "", $this->appConfig->getAppValue($this->appName, "VAPID_pem")), // if you have a PEM file and want to hardcode its content
+					// //'pemFile' => '/var/www/html/apps/webpush/pywebpush/private_key.pem', // if you have a PEM file and can link to it on your filesystem
 					/*
 					REGARDING 'pem':
 					IF: PHP Fatal error: Uncaught ErrorException: [VAPID] Private key should be 32 bytes long when decoded. in /path/to/project/vendor/minishlink/web-push/src/VAPID.php:84

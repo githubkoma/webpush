@@ -50,6 +50,13 @@ class WebPushSubscriptionMapper extends QBMapper {
         return $this->findEntities($qb);
     }
 
+	public function deleteAllSubscriptions() {
+        $qb = $this->db->getQueryBuilder();
+        $qb->delete($this->getTableName());
+        
+        return $qb->executeStatement();
+    }
+
 	// inherited methods: insert, delete, ...
 
 }

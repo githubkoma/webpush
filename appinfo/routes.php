@@ -12,5 +12,6 @@ return [
 	   //['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
 	   ['name' => 'page#do_echo', 'url' => '/echo', 'verb' => 'POST'],
        ['name' => 'personal_settings#subscribe', 'url' => '/subscribe', 'verb' => 'POST'],
+       ['name' => 'admin_settings#generate_vapid_keys', 'url' => '/generateVapidkeys', 'verb' => 'GET'],
     ]
 ];
