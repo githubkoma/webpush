@@ -10,6 +10,8 @@
   - send WebPush with `occ` CLI tool ✅
   - or integrate it yourself into your other Nextcloud App Sourcecode
   - or extend this app yourself to serve as kind of (REST) API
+🚫 It is not..
+  - able to send out every usual Notification as WebPush, therefore the Nextcloud/Notifications App or Pushproxy would have to be altered
 
 ## Requirements
 - Clientside: 

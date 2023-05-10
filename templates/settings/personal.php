@@ -6,7 +6,7 @@ script('webpush', 'personalsettings');
 <p>WebPush - Proof of Concept</p> 
 <p>Personal Settings</p>
 
-<p id="webpushHiddenVapidApplicationServerPublicKey" hidden><?php p($_['VAPID_publicKey']) ?> </p>
+<p id="webpushHiddenVapidApplicationServerPublicKey" hidden><?php p($_['VAPID_publicKey']) ?></p>
 
 <button id="webpushBtnSubscribe">Subscribe to WebPush</button>
 
