@@ -34,8 +34,8 @@ class PersonalSettingsController extends Controller {
     }
 
     /**
-     * @ CORS // <- doesnt work with this activated     
-     * @NoCSRFrequired
+     * @CORS    
+     * @ NoCSRFrequired // = CSRFrequired
      * @NoAdminRequired
      *
      */

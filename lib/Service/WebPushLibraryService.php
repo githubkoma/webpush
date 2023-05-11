@@ -99,15 +99,12 @@ class WebPushLibraryService {
 				//   -> bin/vapid
 				'VAPID' => [						
 
-					'subject' => $this->appConfig->getAppValue($this->appName, "VAPID_subject"), // can be a mailto: or your website address
-					// $ openssl ec -in private_key.pem -pubout -outform DER|tail -c 65|base64|tr -d '=' |tr '/+' '_-' >> public_key.txt
-					// Client has to get the publicKey as well, called applicationServerKey(=serverPublicKey):
-					'publicKey' => $this->appConfig->getAppValue($this->appName, "VAPID_publicKey"), // (recommended) uncompressed public key P-256 encoded in Base64-URL
-					// $ openssl ec -in private_key.pem -outform DER|tail -c +8|head -c 32|base64|tr -d '=' |tr '/+' '_-' >> private_key.txt
+					'subject' => $this->appConfig->getAppValue($this->appName, "VAPID_subject"), // can be a mailto: or your website address					
+					'publicKey' => $this->appConfig->getAppValue($this->appName, "VAPID_publicKey"), // (recommended) uncompressed public key P-256 encoded in Base64-URL					
 					'privateKey' => $this->appConfig->getAppValue($this->appName, "VAPID_privateKey"), // (recommended) in fact the secret multiplier of the private key encoded in Base64-URL
-					// _OR_ PEM STRING/FILE:					
+					// _OR_ subject + (PEM STRING OR PEM FILE):					
 					//'pem' => str_replace("'", "", $this->appConfig->getAppValue($this->appName, "VAPID_pem")), // if you have a PEM file and want to hardcode its content
-					// //'pemFile' => '/var/www/html/apps/webpush/pywebpush/private_key.pem', // if you have a PEM file and can link to it on your filesystem
+					// pemFile' => '/var/www/html/apps/webpush/pywebpush/private_key.pem', // if you have a PEM file and can link to it on your filesystem
 					/*
 					REGARDING 'pem':
 					IF: PHP Fatal error: Uncaught ErrorException: [VAPID] Private key should be 32 bytes long when decoded. in /path/to/project/vendor/minishlink/web-push/src/VAPID.php:84

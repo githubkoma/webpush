@@ -34,26 +34,8 @@ class AdminSettingsController extends Controller {
     }
 
     /**
-     * @ CORS // <- doesnt work with this activated     
-     * @NoCSRFrequired
-     * @NoAdminRequired
-     *
-     */
-    public function subscribe($subscription) {
-        
-        $userId = $this->userId;
-
-        $response = $this->handleServiceErrors(function () use($userId, $subscription) {			
-			return $this->service->subscribe($userId, $subscription);		 
-		});
-
-        return $response;
-
-	}
-
-    /**
-     * @ CORS // <- doesnt work with this activated     
-     * @NoCSRFrequired
+     * @ CORS    // temporarily disabled
+     * @NoCSRFrequired // temporarily
      * @ NoAdminRequired // = ADMIN REQUIRED !
      *
      */

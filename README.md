@@ -10,8 +10,9 @@
   - send WebPush with `occ` CLI tool ✅
   - or integrate it yourself into your other Nextcloud App Sourcecode
   - or extend this app yourself to serve as kind of (REST) API
+
 🚫 It is not..
-  - able to send out every usual Notification as WebPush, therefore the Nextcloud/Notifications App or Pushproxy would have to be altered
+  - able to send out every usual Notification as WebPush, therefore the Nextcloud/Notifications App or Pushproxy would have to be altered (perhaps [see here](https://github.com/nextcloud/notifications/issues/1225))
 
 ## Requirements
 - Clientside: 
@@ -68,6 +69,13 @@ Place this app in **.../apps/** like so:
 - send via Python: https://github.com/web-push-libs/pywebpush
     - it handles authorization, encryption, ...
     - ```bin/python pywebpush --data data.json --info subscription.json --key private_key.pem --head header.json --v --claims claims.json```
+
+Keypair:
+```
+openssl ecparam -genkey -name prime256v1 -out private_key.pem
+openssl ec -in private_key.pem -pubout -outform DER|tail -c 65|base64|tr -d '=' |tr '/+' '_-' >> public_key.txt
+openssl ec -in private_key.pem -outform DER|tail -c +8|head -c 32|base64|tr -d '=' |tr '/+' '_-' >> private_key.txt
+```
  
 data.json: 
 ```
