@@ -27,7 +27,7 @@ class WebPushLibraryService {
 		$this->appConfig = $appConfig;
 		$this->appName = $AppName;
 		$this->log = $log;
-		//$this->appVersion = $this->appConfig->getAppValue($this->appName, "installed_version");			
+		$this->appVersion = $this->appConfig->getAppValue($this->appName, "installed_version");			
 		$this->webPushSubscriptionMapper = $webPushSubscriptionMapper;
 	}
 
@@ -44,11 +44,33 @@ class WebPushLibraryService {
         }
     }	
 
-	public function webpushToUser(string $userId, string $title, string $body, string $actionTitle, string $actionURL) {   
+	public function webpushToUser(string $userId, string $title, string $body, string $actionTitle, string $actionURL) {   		
+		$result = "";		
 		$arrUserSubscriptions = $this->findUserSubscriptions($userId);
 		foreach ($arrUserSubscriptions as $subscription) {
 			$this->notifyOne($userId, $subscription->getSubscription(), $title, $body, $actionTitle, $actionURL);
 		}
+		if ($arrUserSubscriptions == []) {
+			return [];
+		} else {
+			$result = "Ok";
+		}
+
+		return $result;
+	}
+
+	// # sudo -u www-data php occ user:setting admin webpush userApiKey "s3cr3t"
+	public function pushMeByApiKey(string $myself, string $userApiKey, string $message) {   
+		$result = "";
+		$savedUserApiKey = $this->appConfig->getUserValue($myself, $this->appName, "userApiKey"); //$this->secureRandom->generate(16, ISecureRandom::CHAR_HUMAN_READABLE);		
+		
+		if ($myself == "" || $userApiKey == "" || $message == "" || $savedUserApiKey !== $userApiKey) {
+			throw new WrongParameterException;
+		} else {
+			$result = $this->webpushToUser($myself, "PushMe Message", $message, $actionTitle = "", $actionURL = "");
+		}
+
+		return $result;
 	}
 
 	public function generateAndStoreVapidKeys($userId) {  

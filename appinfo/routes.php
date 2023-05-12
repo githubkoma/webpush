@@ -13,5 +13,6 @@ return [
 	   ['name' => 'page#do_echo', 'url' => '/echo', 'verb' => 'POST'],
        ['name' => 'personal_settings#subscribe', 'url' => '/subscribe', 'verb' => 'POST'],
        ['name' => 'admin_settings#generate_vapid_keys', 'url' => '/generateVapidkeys', 'verb' => 'GET'],
+       ['name' => 'push_api#push_me', 'url' => '/api/v0/pushMe/{myself}/{userApiKey}/{message}', 'verbs' => ['GET', 'POST']],
     ]
 ];

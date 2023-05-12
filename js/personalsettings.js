@@ -59,13 +59,14 @@ function subscribeUserToPush(registration) {
     function (error) {
         console.log("Subscription Error:", error);           
         alert(error);
+        alert("Please try again.");
 
         // Unsubscription is needed when the Server changed its VAPID Public Key
         registration.pushManager.getSubscription().then((subscription) => {
           subscription
             .unsubscribe()
             .then((successful) => {
-              alert("You have been unsubscribed, now please try again.");
+              //alert("You have been unsubscribed, now please try again.");
             })
             .catch((e) => {
               alert("Unsubscribing failed.");
